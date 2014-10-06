@@ -1,0 +1,54 @@
+digraph g{
+
+  exit                      [label="std::exit(int exit_code)"]
+  Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box, style="rounded"];
+  atexit                    [label="std::atexit()"];
+  terminate                 [label="std::terminate()"]
+  abort                     [label="std::abort()"]
+  quick_exit                [label="std::quick_exit()"]
+  at_quick_exit             [label="std::at_quick_exit()"];
+  _Exit                     [label="_Exit(int exit_code)"]
+  terminate_handler         [label="terminate_handler()"]
+  mainReturn                [label="return from main()",shape=box,style="rounded"];
+  destroyLocal              [label="Destroys local objects and unwind stack.", shape=box];
+  terminateCause            [label="an exception is thrown and not caught\na noexcept specification is violated\n...",shape=box,style="rounded"];
+  unexpectedCause           [label="a dynamic exception specification is violated [DEPRECATED]",shape=box,style="rounded"];
+  unexpected                [label="std::unexpected() [DEPRECATED]"]
+  unexpected_handler        [label="std::unexpected_handler() [DEPRECATED]"];
+  user_unexpected_handler   [label="User Unexpected Handler",shape=box,style="rounded"]
+  set_unexpected            [label="std::set_unexpected()"]
+  user_terminate_handler    [label="User Terminate Handler",shape=box,style="rounded"];
+  set_terminate             [label="std::set_terminate()"]
+  END                       [shape=circle];
+
+  exit  -> Cleanup;
+  Cleanup -> atexit;
+  atexit -> atexit [label="if more atexit() funcs"]
+  atexit -> terminate [label="if atexit() throws"];
+  atexit -> END [label=otherwise]
+  abort -> END
+  
+  quick_exit-> at_quick_exit; 
+  at_quick_exit -> at_quick_exit [label="if more at_quick_exit()  funcs"];
+  at_quick_exit -> terminate [label="if at_quick_exit() func throws"];
+  at_quick_exit -> _Exit
+  
+  _Exit -> END
+  terminate -> terminate_handler
+  terminate_handler -> abort [label="Default"]
+  terminate_handler -> user_terminate_handler [label="otherwise"]
+  set_terminate -> terminate_handler [label=sets]
+  terminateCause -> terminate
+  
+  mainReturn -> destroyLocal
+  destroyLocal -> exit
+
+  unexpectedCause -> unexpected
+  unexpected -> unexpected_handler
+  unexpected_handler -> terminate [label=Default]
+  unexpected_handler -> terminate [label="If unexpected_handler() throws."]
+  unexpected_handler -> user_unexpected_handler [label=otherwise];
+  set_unexpected -> unexpected_handler [label=sets];
+}
+
+
