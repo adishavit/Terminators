@@ -12,7 +12,7 @@ C++ program terminators include:
 * [`std::_Exit()`](http://en.cppreference.com/w/cpp/utility/program/_Exit)
 * [`std::abort()`](http://en.cppreference.com/w/cpp/utility/program/abort)
 * [`std::terminate()`](http://en.cppreference.com/w/cpp/error/terminate)
-* [`std::unexpected()` (deprecated)](http://en.cppreference.com/w/cpp/error/unexpected)
+* [`std::unexpected()`](http://en.cppreference.com/w/cpp/error/unexpected)(deprecated)
 
 The graph is somewhat incomplete as there some subtle contexts and conditions that are not explicitly stated, and there is no explicit distinction between
 the C and C++ versions of some of the functions (e.g. `exit()`).  

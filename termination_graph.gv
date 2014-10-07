@@ -1,37 +1,56 @@
+// http://www.graphviz.org/doc/info/attrs.html
 digraph g{
-
+  node [fontsize=11,fontname="Monospace"];
+  edge [fontsize=11,fontname="Monospace"];
+  //rankdir=LR
+   
   exit                      [label="std::exit(int exit_code)"]
-  Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box, style="rounded"];
+  Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box];
+  atexit_func               [label="std::atexit() func"];
   atexit                    [label="std::atexit()"];
   terminate                 [label="std::terminate()"]
   abort                     [label="std::abort()"]
   quick_exit                [label="std::quick_exit()"]
+  at_quick_exit_func        [label="std::at_quick_exit() func"];
   at_quick_exit             [label="std::at_quick_exit()"];
   _Exit                     [label="_Exit(int exit_code)"]
   terminate_handler         [label="terminate_handler()"]
   mainReturn                [label="return from main()",shape=box,style="rounded"];
-  destroyLocal              [label="Destroys local objects and unwind stack.", shape=box];
-  terminateCause            [label="an exception is thrown and not caught\na noexcept specification is violated\n...",shape=box,style="rounded"];
-  unexpectedCause           [label="a dynamic exception specification is violated [DEPRECATED]",shape=box,style="rounded"];
+  destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
+  terminateCause            [label="An exception is thrown\nand not caught;\nA noexcept specification\nis violated;\n...",shape=box,style="rounded"];
+  unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
   unexpected                [label="std::unexpected() [DEPRECATED]"]
   unexpected_handler        [label="std::unexpected_handler() [DEPRECATED]"];
   user_unexpected_handler   [label="User Unexpected Handler",shape=box,style="rounded"]
   set_unexpected            [label="std::set_unexpected()"]
   user_terminate_handler    [label="User Terminate Handler",shape=box,style="rounded"];
   set_terminate             [label="std::set_terminate()"]
-  END                       [shape=circle];
+  PROGRAM                       [shape=circle];
+  END                       [shape=doublecircle];
 
+  PROGRAM -> mainReturn
+  PROGRAM -> terminateCause
+  PROGRAM -> unexpectedCause
+  PROGRAM -> exit [label=calls]
+  PROGRAM -> quick_exit [label=calls]
+  PROGRAM -> unexpected [label=calls]
+  PROGRAM -> abort [label=calls]
+  PROGRAM -> terminate [label=calls]
+  PROGRAM -> _Exit [label=calls]
+  
   exit  -> Cleanup;
-  Cleanup -> atexit;
-  atexit -> atexit [label="if more atexit() funcs"]
-  atexit -> terminate [label="if atexit() throws"];
-  atexit -> END [label=otherwise]
+  Cleanup -> atexit_func;
+  atexit -> atexit_func [label=sets]
+  atexit_func -> atexit_func [label="next func"]
+  atexit_func -> terminate [label="if func throws"];
+  atexit_func -> END [label=otherwise]
   abort -> END
   
-  quick_exit-> at_quick_exit; 
-  at_quick_exit -> at_quick_exit [label="if more at_quick_exit()  funcs"];
-  at_quick_exit -> terminate [label="if at_quick_exit() func throws"];
-  at_quick_exit -> _Exit
+  at_quick_exit -> at_quick_exit_func [label=sets]
+  quick_exit-> at_quick_exit_func; 
+  at_quick_exit_func -> at_quick_exit_func [label="next func"];
+  at_quick_exit_func -> terminate [label="if func throws"];
+  at_quick_exit_func -> _Exit
   
   _Exit -> END
   terminate -> terminate_handler
@@ -45,10 +64,22 @@ digraph g{
 
   unexpectedCause -> unexpected
   unexpected -> unexpected_handler
-  unexpected_handler -> terminate [label=Default]
-  unexpected_handler -> terminate [label="If unexpected_handler() throws."]
+  unexpected_handler -> terminate [label="Default & if handler throws."]
   unexpected_handler -> user_unexpected_handler [label=otherwise];
-  set_unexpected -> unexpected_handler [label=sets];
+  set_unexpected -> unexpected_handler [label=sets];  
+  
+  user_unexpected_handler -> END [style=dashed];
+  user_terminate_handler -> END [style=dashed];
+  
+  {rank=source; PROGRAM }
+  {rank=same; mainReturn terminateCause unexpectedCause}  
+  
+  {rank=same; at_quick_exit at_quick_exit_func}
+  {rank=same; set_terminate terminate_handler}
+  {rank=same; set_unexpected unexpected_handler}
+  {rank=same; atexit atexit_func}
+  
+  {rank=same; user_unexpected_handler user_terminate_handler}
+  {rank=sink; END }
 }
-
 
