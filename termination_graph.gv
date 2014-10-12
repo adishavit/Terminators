@@ -3,30 +3,36 @@ digraph g{
   node [fontsize=11,fontname="Monospace"];
   edge [fontsize=11,fontname="Monospace"];
   //rankdir=LR
+  //ratio=1.5
    
-  exit                      [label="std::exit(int exit_code)"]
+  exit                      [label="std::exit(int exit_code)",style="filled"]
   Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box];
   atexit_func               [label="std::atexit() func"];
   atexit                    [label="std::atexit()"];
-  terminate                 [label="std::terminate()"]
-  abort                     [label="std::abort()"]
-  quick_exit                [label="std::quick_exit()"]
+  terminate                 [label="std::terminate()",style="filled"]
+  abort                     [label="std::abort()",style="filled"]
+  quick_exit                [label="std::quick_exit()",style="filled"]
   at_quick_exit_func        [label="std::at_quick_exit() func"];
   at_quick_exit             [label="std::at_quick_exit()"];
-  _Exit                     [label="_Exit(int exit_code)"]
+  _Exit                     [label="_Exit(int exit_code)",style="filled"]
   terminate_handler         [label="terminate_handler()"]
   mainReturn                [label="return from main()",shape=box,style="rounded"];
   destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
   terminateCause            [label="An exception is thrown\nand not caught;\nA noexcept specification\nis violated;\n...",shape=box,style="rounded"];
   unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
-  unexpected                [label="std::unexpected() [DEPRECATED]"]
+  unexpected                [label="std::unexpected() [DEPRECATED]",style="filled"]
   unexpected_handler        [label="std::unexpected_handler() [DEPRECATED]"];
   user_unexpected_handler   [label="User Unexpected Handler",shape=box,style="rounded"]
   set_unexpected            [label="std::set_unexpected()"]
   user_terminate_handler    [label="User Terminate Handler",shape=box,style="rounded"];
   set_terminate             [label="std::set_terminate()"]
-  PROGRAM                       [shape=circle];
+  signal                    [label="std::signal(SIGABRT)"]
+  user_signal_handler            [label="User ABRT signal handler()",shape=box,style="rounded"]
+  raise						[label="std::raise(SIGABRT)",style="filled"]
+  PROGRAM                   [shape=circle];
   END                       [shape=doublecircle];
+
+  /////////////////////////////////////////////////////////////////////////////
 
   PROGRAM -> mainReturn
   PROGRAM -> terminateCause
@@ -37,6 +43,7 @@ digraph g{
   PROGRAM -> abort [label=calls]
   PROGRAM -> terminate [label=calls]
   PROGRAM -> _Exit [label=calls]
+  PROGRAM -> raise [label=calls]
   
   exit  -> Cleanup;
   Cleanup -> atexit_func;
@@ -44,7 +51,7 @@ digraph g{
   atexit_func -> atexit_func [label="next func"]
   atexit_func -> terminate [label="if func throws"];
   atexit_func -> END [label=otherwise]
-  abort -> END
+  abort -> END [label=otherwise]
   
   at_quick_exit -> at_quick_exit_func [label=sets]
   quick_exit-> at_quick_exit_func; 
@@ -71,6 +78,14 @@ digraph g{
   user_unexpected_handler -> END [style=dashed];
   user_terminate_handler -> END [style=dashed];
   
+  signal -> user_signal_handler [label=sets]
+  abort -> user_signal_handler [label="if set"]
+  user_signal_handler -> END [style=dashed];
+  raise -> user_signal_handler
+  
+  
+  /////////////////////////////////////////////////////////////////////////////
+  
   {rank=source; PROGRAM }
   {rank=same; mainReturn terminateCause unexpectedCause}  
   
@@ -78,8 +93,13 @@ digraph g{
   {rank=same; set_terminate terminate_handler}
   {rank=same; set_unexpected unexpected_handler}
   {rank=same; atexit atexit_func}
+  {rank=same; signal user_signal_handler }
+
+  //{rank=same; quick_exit raise exit terminate unexpected abort _Exit}
   
-  {rank=same; user_unexpected_handler user_terminate_handler}
+  
+  
+  {rank=same; user_unexpected_handler user_terminate_handler user_signal_handler}
   {rank=sink; END }
 }
 
