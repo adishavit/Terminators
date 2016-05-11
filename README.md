@@ -6,7 +6,7 @@ A GraphViz diagram that shows both normal and unexpected program termination flo
 There are multiple ways a C++ program may terminate. These include both normal and unexpected termination.  
 This GraphViz diagram shows the program termination flows as defined by the standard. 
 
-C++ program terminators include:
+Standard C++ program terminators include:
 * [`std::exit()`](http://en.cppreference.com/w/cpp/utility/program/exit)
 * [`std::quick_exit()`](http://en.cppreference.com/w/cpp/utility/program/quick_exit)
 * [`std::_Exit()`](http://en.cppreference.com/w/cpp/utility/program/_Exit)
@@ -14,11 +14,14 @@ C++ program terminators include:
 * [`std::terminate()`](http://en.cppreference.com/w/cpp/error/terminate)
 * [`std::unexpected()`](http://en.cppreference.com/w/cpp/error/unexpected)(deprecated)
 
-The graph is somewhat incomplete as there some subtle contexts and conditions that are not explicitly stated, and there is no explicit distinction between
-the C and C++ versions of some of the functions (e.g. `exit()`).  
-It does attempt to show the important functions and calls.
+For completeness, Microsoft specific terminators:
+* [`__fastfail()`](https://msdn.microsoft.com/en-us/library/dn774154.aspx)
+
+
+Most of the functions have subtle contexts, conditions and effects that should be considered by checking their documentation.  
+The diagram does not make an explicit distinction between the C and C++ versions of some of the functions (e.g. `exit()`).  
+The orange path shows normal program termination.
 
 ![The call graph](termination_graph.png)
-
 
 Corrections, additions, updates and layout improvements will be gladly accepted.

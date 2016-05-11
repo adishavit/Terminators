@@ -1,6 +1,6 @@
 // http://www.graphviz.org/doc/info/attrs.html
 digraph g{
-  node [fontsize=11,fontname="Monospace"];
+  node [fontsize=11,fontname="Monospace"];	
   edge [fontsize=11,fontname="Monospace"];
   //rankdir=LR
   //ratio=1.5
@@ -20,21 +20,23 @@ digraph g{
   destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
   terminateCause            [label="An exception is thrown\nand not caught;\nA noexcept specification\nis violated;\n...",shape=box,style="rounded"];
   unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
-  unexpected                [label="std::unexpected() [DEPRECATED]",style="filled"]
-  unexpected_handler        [label="std::unexpected_handler() [DEPRECATED]"];
+  unexpected                [label="std::unexpected()\n[DEPRECATED]",style="filled"]
+  unexpected_handler        [label="std::unexpected_handler()\n[DEPRECATED]"];
   user_unexpected_handler   [label="User Unexpected Handler",shape=box,style="rounded"]
   set_unexpected            [label="std::set_unexpected()"]
   user_terminate_handler    [label="User Terminate Handler",shape=box,style="rounded"];
   set_terminate             [label="std::set_terminate()"]
   signal                    [label="std::signal(SIGABRT)"]
-  user_signal_handler            [label="User ABRT signal handler()",shape=box,style="rounded"]
+  user_signal_handler       [label="User ABRT signal handler()",shape=box,style="rounded"]
   raise						[label="std::raise(SIGABRT)",style="filled"]
   PROGRAM                   [shape=circle];
   END                       [shape=doublecircle];
+  
+  __fastfail				[label="__fastfail(FAST_FAIL_*)\n[Microsoft Specific]",style="filled",fillcolor=gray94, color=gray,fontcolor=gray44]
 
   /////////////////////////////////////////////////////////////////////////////
 
-  PROGRAM -> mainReturn
+  PROGRAM -> mainReturn [color=darkorange style=bold]
   PROGRAM -> terminateCause
   PROGRAM -> unexpectedCause
   PROGRAM -> exit [label=calls]
@@ -45,12 +47,12 @@ digraph g{
   PROGRAM -> _Exit [label=calls]
   PROGRAM -> raise [label=calls]
   
-  exit  -> Cleanup;
-  Cleanup -> atexit_func;
+  exit  -> Cleanup [color=darkorange style=bold]
+  Cleanup -> atexit_func  [color=darkorange style=bold]
   atexit -> atexit_func [label=sets]
   atexit_func -> atexit_func [label="next func"]
   atexit_func -> terminate [label="if func throws"];
-  atexit_func -> END [label=otherwise]
+  atexit_func -> END [label=otherwise color=darkorange style=bold]
   abort -> END [label=otherwise]
   
   at_quick_exit -> at_quick_exit_func [label=sets]
@@ -66,8 +68,8 @@ digraph g{
   set_terminate -> terminate_handler [label=sets]
   terminateCause -> terminate
   
-  mainReturn -> destroyLocal
-  destroyLocal -> exit
+  mainReturn -> destroyLocal [color=darkorange style=bold]
+  destroyLocal -> exit [color=darkorange style=bold]
 
   unexpectedCause -> unexpected
   unexpected -> unexpected_handler
@@ -84,19 +86,27 @@ digraph g{
   raise -> user_signal_handler
   
   
+  PROGRAM -> __fastfail [label="calls\n[Microsoft Specific]", color=gray]
+  __fastfail -> END [color=gray]
+
+  // invisibles
+  //terminate -> abort [style="invis"]
+  
   /////////////////////////////////////////////////////////////////////////////
   
   {rank=source; PROGRAM }
   {rank=same; mainReturn terminateCause unexpectedCause}  
   
-  {rank=same; at_quick_exit at_quick_exit_func}
-  {rank=same; set_terminate terminate_handler}
-  {rank=same; set_unexpected unexpected_handler}
-  {rank=same; atexit atexit_func}
-  {rank=same; signal user_signal_handler }
+  //{rank=same; at_quick_exit at_quick_exit_func}
+  //{rank=same; set_terminate terminate_handler}
+  //{rank=same; set_unexpected unexpected_handler}
+  //{rank=same; atexit atexit_func}
+  //{rank=same; signal user_signal_handler }
 
-  //{rank=same; quick_exit raise exit terminate unexpected abort _Exit}
-  
+  //{rank=same; quick_exit raise exit terminate unexpected abort _Exit __fastfail}
+  //{rank=same;  _Exit __fastfail }
+  //{rank=same;  abort raise  }
+  {rank=same; __fastfail END  }
   
   
   {rank=same; user_unexpected_handler user_terminate_handler user_signal_handler}
