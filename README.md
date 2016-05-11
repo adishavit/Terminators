@@ -24,4 +24,6 @@ The orange path shows normal program termination.
 
 ![The call graph](termination_graph.png)
 
+Full res [here](termination_graph.svg).
+
 Corrections, additions, updates and layout improvements will be gladly accepted.
