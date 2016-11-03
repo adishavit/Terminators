@@ -18,7 +18,7 @@ digraph g{
   terminate_handler         [label="terminate_handler()"]
   mainReturn                [label="return from main()",shape=box,style="rounded"];
   destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
-  terminateCause            [label="An exception is thrown\nand not caught;\nA noexcept specification\nis violated;\n...",shape=box,style="rounded"];
+  terminateCause            [label="An exception is thrown\nand not caught;\n\nA noexcept specification\nis violated;\n\nUncaught exception\nduring the execution\nof a parallel\nalgorithm element\naccess [C++17];\n...",shape=box,style="rounded"];   
   unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
   unexpected                [label="std::unexpected()\n[DEPRECATED]",style="filled"]
   unexpected_handler        [label="std::unexpected_handler()\n[DEPRECATED]"];
