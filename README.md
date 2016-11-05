@@ -22,8 +22,6 @@ Most of the functions have subtle contexts, conditions and effects that should b
 The diagram does not make an explicit distinction between the C and C++ versions of some of the functions (e.g. `exit()`).  
 The orange path shows normal program termination.
 
-![The call graph](termination_graph.png)
-
-Full res [here](termination_graph.svg).
+![The call graph](https://cdn.rawgit.com/adishavit/Terminators/master/termination_graph.svg).
 
 Corrections, additions, updates and layout improvements will be gladly accepted.
