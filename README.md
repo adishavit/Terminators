@@ -17,6 +17,7 @@ Standard C++ program terminators include:
 For completeness, Microsoft specific terminators:
 * [`__fastfail()`](https://msdn.microsoft.com/en-us/library/dn774154.aspx)
 
+Read more on the associated blog post [here](http://videocortex.io/2016/terminators/).
 
 Most of the functions have subtle contexts, conditions and effects that should be considered by checking their documentation.  
 The diagram does not make an explicit distinction between the C and C++ versions of some of the functions (e.g. `exit()`).  
