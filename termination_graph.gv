@@ -1,10 +1,10 @@
 // http://www.graphviz.org/doc/info/attrs.html
 digraph g{
-  node [fontsize=11,fontname="Monospace"];	
+  node [fontsize=11,fontname="Monospace"];
   edge [fontsize=11,fontname="Monospace"];
   //rankdir=LR
   //ratio=1.5
-   
+
   exit                      [label="std::exit(int exit_code)",style="filled"]
   Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box];
   atexit_func               [label="std::atexit() func"];
@@ -18,7 +18,7 @@ digraph g{
   terminate_handler         [label="terminate_handler()"]
   mainReturn                [label="return from main()",shape=box,style="rounded"];
   destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
-  terminateCause            [label="An exception is thrown\nand not caught;\n\nA noexcept specification\nis violated;\n\nUncaught exception\nduring the execution\nof a parallel\nalgorithm element\naccess [C++17];\n...",shape=box,style="rounded"];   
+  terminateCause            [label="An exception is thrown\nand not caught;\n\nA noexcept specification\nis violated;\n\nUncaught exception\nduring the execution\nof a parallel\nalgorithm element\naccess [C++17];\n...",shape=box,style="rounded"];
   unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
   unexpected                [label="std::unexpected()\n[DEPRECATED]",style="filled"]
   unexpected_handler        [label="std::unexpected_handler()\n[DEPRECATED]"];
@@ -28,11 +28,12 @@ digraph g{
   set_terminate             [label="std::set_terminate()"]
   signal                    [label="std::signal(SIGABRT)"]
   user_signal_handler       [label="User ABRT signal handler()",shape=box,style="rounded"]
-  raise						[label="std::raise(SIGABRT)",style="filled"]
+  raise                     [label="std::raise(SIGABRT)",style="filled"]
   PROGRAM                   [shape=circle];
   END                       [shape=doublecircle];
-  
-  __fastfail				[label="__fastfail(FAST_FAIL_*)\n[Microsoft Specific]",style="filled",fillcolor=gray94, color=gray,fontcolor=gray44]
+
+  __fastfail                [label="__fastfail(FAST_FAIL_*)\n[Microsoft-specific]",style="filled",fillcolor=gray94, color=gray,fontcolor=gray44]
+  _exit                     [label="_exit(int status)\n[POSIX-specific]",style="filled",fillcolor=gray94,color=gray,fontcolor=gray44]
 
   /////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +47,7 @@ digraph g{
   PROGRAM -> terminate [label=calls]
   PROGRAM -> _Exit [label=calls]
   PROGRAM -> raise [label=calls]
-  
+
   exit  -> Cleanup [color=darkorange style=bold]
   Cleanup -> atexit_func  [color=darkorange style=bold]
   atexit -> atexit_func [label=sets]
@@ -54,20 +55,20 @@ digraph g{
   atexit_func -> terminate [label="if func throws"];
   atexit_func -> END [label=otherwise color=darkorange style=bold]
   abort -> END [label=otherwise]
-  
+
   at_quick_exit -> at_quick_exit_func [label=sets]
-  quick_exit-> at_quick_exit_func; 
+  quick_exit-> at_quick_exit_func;
   at_quick_exit_func -> at_quick_exit_func [label="next func"];
   at_quick_exit_func -> terminate [label="if func throws"];
   at_quick_exit_func -> _Exit
-  
+
   _Exit -> END
   terminate -> terminate_handler
   terminate_handler -> abort [label="Default"]
   terminate_handler -> user_terminate_handler [label="otherwise"]
   set_terminate -> terminate_handler [label=sets]
   terminateCause -> terminate
-  
+
   mainReturn -> destroyLocal [color=darkorange style=bold]
   destroyLocal -> exit [color=darkorange style=bold]
 
@@ -75,28 +76,31 @@ digraph g{
   unexpected -> unexpected_handler
   unexpected_handler -> terminate [label="Default & if handler throws."]
   unexpected_handler -> user_unexpected_handler [label=otherwise];
-  set_unexpected -> unexpected_handler [label=sets];  
-  
+  set_unexpected -> unexpected_handler [label=sets];
+
   user_unexpected_handler -> END [style=dashed];
   user_terminate_handler -> END [style=dashed];
-  
+
   signal -> user_signal_handler [label=sets]
   abort -> user_signal_handler [label="if set"]
   user_signal_handler -> END [style=dashed];
   raise -> user_signal_handler
-  
-  
-  PROGRAM -> __fastfail [label="calls\n[Microsoft Specific]", color=gray]
+
+
+  PROGRAM -> __fastfail [label="calls\n[Microsoft-specific]", color=gray]
   __fastfail -> END [color=gray]
+
+  PROGRAM -> _exit [label="calls\n[POSIX-specific]", color=gray]
+  _exit -> END [color=gray]
 
   // invisibles
   //terminate -> abort [style="invis"]
-  
+
   /////////////////////////////////////////////////////////////////////////////
-  
+
   {rank=source; PROGRAM }
-  {rank=same; mainReturn terminateCause unexpectedCause}  
-  
+  {rank=same; mainReturn terminateCause unexpectedCause}
+
   //{rank=same; at_quick_exit at_quick_exit_func}
   //{rank=same; set_terminate terminate_handler}
   //{rank=same; set_unexpected unexpected_handler}
@@ -104,11 +108,11 @@ digraph g{
   //{rank=same; signal user_signal_handler }
 
   //{rank=same; quick_exit raise exit terminate unexpected abort _Exit __fastfail}
-  //{rank=same;  _Exit __fastfail }
+  //{rank=same;  _Exit _exit __fastfail }
   //{rank=same;  abort raise  }
-  {rank=same; __fastfail END  }
-  
-  
+  {rank=same; __fastfail _exit END  }
+
+
   {rank=same; user_unexpected_handler user_terminate_handler user_signal_handler}
   {rank=sink; END }
 }
