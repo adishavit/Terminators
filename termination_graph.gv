@@ -25,7 +25,7 @@ digraph g{
   at_quick_exit             [label="std::at_quick_exit()", style="filled", fillcolor=pink];
 
   unexpected                [label="std::unexpected()\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", style="filled", fillcolor=gray96, color=gray, fontcolor=gray26];
-  unexpected_handler        [label="std::unexpected_handler()\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", fillcolor=gray96, color=gray, fontcolor=gray26];
+  unexpected_handler        [label="std::unexpected_handler\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", fillcolor=gray96, color=gray, fontcolor=gray26];
   unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]",shape=box,style="rounded", fillcolor=gray96, color=gray, fontcolor=gray26];
   user_unexpected_handler   [label="User-specified\nUnexpected Handler",shape=box,style="rounded", fillcolor=gray96, color=gray, fontcolor=gray26];
   set_unexpected            [label="std::set_unexpected()\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", style="filled", fillcolor=lightpink, color=gray, fontcolor=gray26];
@@ -110,10 +110,12 @@ digraph g{
 
   {rank=same; at_quick_exit quick_exit};
 
-  {rank=same; at_quick_exit_func unexpected __fastfail};
+  {rank=same; at_quick_exit_func unexpected};
 
   {rank=same; atexit set_unexpected};
   // {rank=same; exit _Exit};
+
+  {rank=same; terminate __fastfail};
 
   // {rank=same; at_quick_exit at_quick_exit_func};
   // {rank=same; set_terminate terminate_handler};
