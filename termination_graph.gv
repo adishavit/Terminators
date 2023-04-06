@@ -1,115 +1,139 @@
 // http://www.graphviz.org/doc/info/attrs.html
 digraph g{
-  node [fontsize=11,fontname="Monospace"];	
+  node [fontsize=11,fontname="Monospace"];
   edge [fontsize=11,fontname="Monospace"];
-  //rankdir=LR
-  //ratio=1.5
-   
-  exit                      [label="std::exit(int exit_code)",style="filled"]
+  // rankdir=LR
+  // ratio=1.5
+  _Exit                     [label="_Exit(int exit_code)",style="filled"];
+
+  atexit_func               [label="User-specified\nexit handler(s)"];
+  atexit                    [label="std::atexit()", style="filled", fillcolor=pink];
+
+  set_terminate             [label="std::set_terminate()",style="filled",fillcolor=pink];
+  terminate                 [label="std::terminate()",style="filled"];
+  terminate_handler         [label="std::terminate_handler"];
+  terminateCause            [label="An exception is thrown\nand not caught;\n\nAn exception is thrown\n(e.g., from a destructor)\nduring the handling of\nanother exception;\n\nA noexcept specification\nis violated;\n\nUncaught exception\nduring the execution\nof a parallel\nalgorithm element\naccess [C++17];\n\n...",shape=box,style="rounded"];
+  user_terminate_handler    [label="User-Specified\nTerminate Handler",shape=box,style="rounded"];
+
+  mainReturn                [label="return from main();\n\nthe return value\nis the exit_code",shape=box,style="rounded"];
   Cleanup                   [label="Normal Program Termination:\ndestroys all static objects;\n flushes all buffers;\n closes all I/O channels",shape=box];
-  atexit_func               [label="std::atexit() func"];
-  atexit                    [label="std::atexit()"];
-  terminate                 [label="std::terminate()",style="filled"]
-  abort                     [label="std::abort()",style="filled"]
-  quick_exit                [label="std::quick_exit()",style="filled"]
-  at_quick_exit_func        [label="std::at_quick_exit() func"];
-  at_quick_exit             [label="std::at_quick_exit()"];
-  _Exit                     [label="_Exit(int exit_code)",style="filled"]
-  terminate_handler         [label="terminate_handler()"]
-  mainReturn                [label="return from main()",shape=box,style="rounded"];
   destroyLocal              [label="Destroy local objects\nand unwind stack.", shape=box];
-  terminateCause            [label="An exception is thrown\nand not caught;\n\nA noexcept specification\nis violated;\n\nUncaught exception\nduring the execution\nof a parallel\nalgorithm element\naccess [C++17];\n...",shape=box,style="rounded"];   
-  unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED]",shape=box,style="rounded"];
-  unexpected                [label="std::unexpected()\n[DEPRECATED]",style="filled"]
-  unexpected_handler        [label="std::unexpected_handler()\n[DEPRECATED]"];
-  user_unexpected_handler   [label="User Unexpected Handler",shape=box,style="rounded"]
-  set_unexpected            [label="std::set_unexpected()"]
-  user_terminate_handler    [label="User Terminate Handler",shape=box,style="rounded"];
-  set_terminate             [label="std::set_terminate()"]
-  signal                    [label="std::signal(SIGABRT)"]
-  user_signal_handler       [label="User ABRT signal handler()",shape=box,style="rounded"]
-  raise						[label="std::raise(SIGABRT)",style="filled"]
+  exit                      [label="std::exit(int exit_code)",style="filled"];
+
+  quick_exit                [label="std::quick_exit()",style="filled"];
+  at_quick_exit_func        [label="User-specified\nquick_exit handler(s)"];
+  at_quick_exit             [label="std::at_quick_exit()", style="filled", fillcolor=pink];
+
+  unexpected                [label="std::unexpected()\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", style="filled", fillcolor=gray96, color=gray, fontcolor=gray26];
+  unexpected_handler        [label="std::unexpected_handler\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", fillcolor=gray96, color=gray, fontcolor=gray26];
+  unexpectedCause           [label="A dynamic exception\nspecification is violated\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]",shape=box,style="rounded", fillcolor=gray96, color=gray, fontcolor=gray26];
+  user_unexpected_handler   [label="User-specified\nUnexpected Handler",shape=box,style="rounded", fillcolor=gray96, color=gray, fontcolor=gray26];
+  set_unexpected            [label="std::set_unexpected()\n[DEPRECATED IN C++11]\n[REMOVED    IN C++17]", style="filled", fillcolor=lightpink, color=gray, fontcolor=gray26];
+
+  abort                     [label="std::abort()",style="filled"];
+
+  raise                     [label="std::raise(SIGABRT)",style="filled"];
+  signal                    [label="std::signal(SIGABRT)", style="filled", fillcolor=pink];
+  user_signal_handler       [label="User-specified\nSignal Handler\nfor SIGABRT",shape=box,style="rounded"];
+
+  _exit                     [label="_exit(int status)\n[POSIX-specific]",style="filled",fillcolor=gray94,color=gray,fontcolor=gray44];
+  __fastfail                [label="__fastfail(FAST_FAIL_*)\n[Microsoft-specific]",style="filled",fillcolor=gray94, color=gray,fontcolor=gray44];
+
   PROGRAM                   [shape=circle];
   END                       [shape=doublecircle];
-  
-  __fastfail				[label="__fastfail(FAST_FAIL_*)\n[Microsoft Specific]",style="filled",fillcolor=gray94, color=gray,fontcolor=gray44]
 
   /////////////////////////////////////////////////////////////////////////////
 
-  PROGRAM -> mainReturn [color=darkorange style=bold]
-  PROGRAM -> terminateCause
-  PROGRAM -> unexpectedCause
-  PROGRAM -> exit [label=calls]
-  PROGRAM -> quick_exit [label=calls]
-  PROGRAM -> unexpected [label=calls]
-  PROGRAM -> abort [label=calls]
-  PROGRAM -> terminate [label=calls]
-  PROGRAM -> _Exit [label=calls]
-  PROGRAM -> raise [label=calls]
-  
-  exit  -> Cleanup [color=darkorange style=bold]
-  Cleanup -> atexit_func  [color=darkorange style=bold]
-  atexit -> atexit_func [label=sets]
-  atexit_func -> atexit_func [label="next func"]
+  PROGRAM -> __fastfail [label="calls\n[Microsoft-specific]", color=gray, fontcolor=gray44];
+  PROGRAM -> _Exit [label="calls"];
+  PROGRAM -> _exit [label="calls\n[POSIX-specific]", color=gray, fontcolor=gray44];
+  __fastfail -> END [color=gray];
+  // _exit -> END [color=gray];
+  _exit -> _Exit [label="is same as",color=gray, fontcolor=gray44];
+  _Exit -> END;
+
+  PROGRAM -> mainReturn [color=darkorange style=bold];
+  mainReturn -> destroyLocal [color=darkorange style=bold];
+  destroyLocal -> exit [color=darkorange style=bold];
+
+  PROGRAM -> exit [label="calls"];
+  exit -> Cleanup [color=darkorange style=bold];
+  Cleanup -> atexit_func[color=darkorange style=bold];
+  atexit -> atexit_func [label="registers", color=pink, fontcolor=hotpink];
+  atexit_func -> atexit_func [label="in reverse\norder"];
   atexit_func -> terminate [label="if func throws"];
-  atexit_func -> END [label=otherwise color=darkorange style=bold]
-  abort -> END [label=otherwise]
-  
-  at_quick_exit -> at_quick_exit_func [label=sets]
-  quick_exit-> at_quick_exit_func; 
-  at_quick_exit_func -> at_quick_exit_func [label="next func"];
+  atexit_func -> END [color=darkorange style=bold];
+
+  PROGRAM -> quick_exit [label="calls"];
+  at_quick_exit -> at_quick_exit_func [label="registers", color=pink, fontcolor=hotpink];
+  quick_exit-> at_quick_exit_func;
+  at_quick_exit_func -> at_quick_exit_func [label="in reverse\norder"];
   at_quick_exit_func -> terminate [label="if func throws"];
   at_quick_exit_func -> _Exit
-  
-  _Exit -> END
-  terminate -> terminate_handler
-  terminate_handler -> abort [label="Default"]
-  terminate_handler -> user_terminate_handler [label="otherwise"]
-  set_terminate -> terminate_handler [label=sets]
-  terminateCause -> terminate
-  
-  mainReturn -> destroyLocal [color=darkorange style=bold]
-  destroyLocal -> exit [color=darkorange style=bold]
 
-  unexpectedCause -> unexpected
-  unexpected -> unexpected_handler
-  unexpected_handler -> terminate [label="Default & if handler throws."]
-  unexpected_handler -> user_unexpected_handler [label=otherwise];
-  set_unexpected -> unexpected_handler [label=sets];  
-  
-  user_unexpected_handler -> END [style=dashed];
+  PROGRAM -> terminateCause;
+  PROGRAM -> terminate [label="calls"];
+  terminate -> terminate_handler;
+  terminate_handler -> abort;
+  terminate_handler -> user_terminate_handler [style=dotted, label="if user-specified", fontname="monospace italic"];
+  set_terminate -> terminate_handler [label="sets", color=pink, fontcolor=hotpink];
+  terminateCause -> terminate;
   user_terminate_handler -> END [style=dashed];
-  
-  signal -> user_signal_handler [label=sets]
-  abort -> user_signal_handler [label="if set"]
+
+  PROGRAM -> abort [label="calls"];
+  abort -> raise;
+
+  PROGRAM -> unexpectedCause [color=gray76];
+  PROGRAM -> unexpected [label="calls", color=gray76, fontcolor=gray26];
+  unexpectedCause -> unexpected [color=gray76];
+  unexpected -> unexpected_handler [color=gray76];
+  unexpected_handler -> terminate [label="default or if\nunexpected_handler\nthrows", color=gray76, fontcolor=gray26];
+  unexpected_handler -> user_unexpected_handler [style=dotted, color=gray76, fontcolor=gray26, label="if user-specified", fontname="monospace italic"];
+  set_unexpected -> unexpected_handler [label="sets", color=pink, fontcolor=hotpink];
+  user_unexpected_handler -> END [style=dashed, color=gray76];
+
+  PROGRAM -> raise [label="calls"];
+  raise -> END;
+  signal -> user_signal_handler [label="sets", color=pink, fontcolor=hotpink];
+  raise -> user_signal_handler [style=dotted, label="if user-specified", fontname="monospace italic"];
   user_signal_handler -> END [style=dashed];
-  raise -> user_signal_handler
-  
-  
-  PROGRAM -> __fastfail [label="calls\n[Microsoft Specific]", color=gray]
-  __fastfail -> END [color=gray]
 
-  // invisibles
-  //terminate -> abort [style="invis"]
-  
+  // Invisibles.
+  // terminate -> abort [style="invis"];
+  // abort -> END [style="invis"];
+
   /////////////////////////////////////////////////////////////////////////////
-  
-  {rank=source; PROGRAM }
-  {rank=same; mainReturn terminateCause unexpectedCause}  
-  
-  //{rank=same; at_quick_exit at_quick_exit_func}
-  //{rank=same; set_terminate terminate_handler}
-  //{rank=same; set_unexpected unexpected_handler}
-  //{rank=same; atexit atexit_func}
-  //{rank=same; signal user_signal_handler }
 
-  //{rank=same; quick_exit raise exit terminate unexpected abort _Exit __fastfail}
-  //{rank=same;  _Exit __fastfail }
-  //{rank=same;  abort raise  }
-  {rank=same; __fastfail END  }
-  
-  
-  {rank=same; user_unexpected_handler user_terminate_handler user_signal_handler}
-  {rank=sink; END }
+  {rank=source; PROGRAM};
+
+  {rank=same; mainReturn terminateCause unexpectedCause};
+
+  {rank=same; at_quick_exit quick_exit};
+
+  {rank=same; at_quick_exit_func unexpected};
+
+  {rank=same; atexit set_unexpected};
+  // {rank=same; exit _Exit};
+
+  {rank=same; terminate __fastfail};
+
+  // {rank=same; at_quick_exit at_quick_exit_func};
+  // {rank=same; set_terminate terminate_handler};
+  // {rank=same; set_unexpected unexpected_handler};
+  // {rank=same; atexit atexit_func};
+  // {rank=same; signal user_signal_handler};
+
+  // {rank=same; quick_exit raise exit terminate unexpected abort _Exit __fastfail};
+  // {rank=same; _Exit _exit __fastfail};
+  // {rank=same; _Exit _exit};
+  // {rank=same; __fastfail _exit};
+  {rank=same; raise signal};
+  // {rank=same; __fastfail _exit END};
+
+  {rank=same; user_unexpected_handler user_terminate_handler user_signal_handler};
+
+  // {rank=same; __fastfail END};
+
+  {rank=sink; END};
 }
 
